@@ -1,0 +1,69 @@
+%% =============================================================================
+%% BEGIN custom tex styles
+
+\usepackage{listings}
+
+% Override Scribble's default SecRef to numeric only
+\renewcommand{\SecRef}[2]{#1}
+\renewcommand{\vee}{\mbox{or}}
+
+% For bib style
+\newcommand{\Thyperref}[2]{\hyperref[#2]{#1}}
+
+\let\captionwidth\relax
+
+%% -----------------------------------------------------------------------------
+%% common PL paper formatting
+
+\newcommand{\subt}{\mathrel{<:}}
+\newcommand{\subteq}{\mathrel{\leqslant:}}
+
+%% -----------------------------------------------------------------------------
+%% formatting Python code
+
+% Default fixed font does not support bold face
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{8} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{8}  % for normal
+
+% Custom colors
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+% Python style for highlighting
+\newcommand\pythonstyle{\lstset{
+language=Python,
+basicstyle=\ttm,
+commentstyle=\fontfamily{tt},
+otherkeywords={self},             % Add keywords here
+keywordstyle=\ttb\color{deepblue},
+emph={MyClass,__init__},          % Custom highlighting
+emphstyle=\ttb\color{deepred},    % Custom highlighting style
+stringstyle=\color{deepgreen},
+frame=none,                         % Any extra options here
+showstringspaces=false            % 
+}}
+
+% Python environment
+\lstnewenvironment{python}[1][]
+{
+\pythonstyle
+\lstset{#1}
+}
+{}
+
+% Python for external files
+\newcommand\pythonexternal[1]{{
+\pythonstyle
+\lstinputlisting{#1}}}
+
+% Python for inline
+\newcommand\pythoninline[1]{{\pythonstyle\lstinline!#1!}}
+
+%% -----------------------------------------------------------------------------
+%% enable page numbers
+
+\settopmatter{printfolios=true}
+
+%% END custom tex styles
+%% =============================================================================
