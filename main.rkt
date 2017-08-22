@@ -130,3 +130,9 @@
      (make-new-paper name (*quiet?*))]
     [_
      (printf "unrecognized mode, try 'raco gtp-paper --help'~n")])))
+
+;; -----------------------------------------------------------------------------
+
+(module+ test
+  ;; TODO
+)

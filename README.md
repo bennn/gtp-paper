@@ -1,5 +1,6 @@
 gtp-paper
 ===
+[![Scribble](https://img.shields.io/badge/Docs-Scribble-blue.svg)](http://docs.racket-lang.org/gtp-paper/index.html)
 
 Raco tool for starting a new [GTP](http://prl.ccs.neu.edu/gtp/)-flavor Scribble paper.
 
