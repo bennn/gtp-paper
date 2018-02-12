@@ -97,4 +97,7 @@
   (apply exact (append (list "\\pythoninline{") x (list "}"))))
 
 (define (pythonexternal a)
-  (exact (format "\\pythonexternal{~a}" a)))
+  (exact (string-append "\\pythonexternal{" (path-string->string a) "}")))
+
+(define (path-string->string x)
+  (if (string? x) x (path->string x)))
