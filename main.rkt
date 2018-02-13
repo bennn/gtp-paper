@@ -15,12 +15,17 @@
 
   (contract-out
    [make-new-paper
-    (-> (and/c path-relative-to-cwd/c free-directory-name/c) void?)]))
+    (-> (and/c path-relative-to-cwd/c free-directory-name/c) void?)]
+   [rename-paper
+    (-> (and/c path-relative-to-cwd/c directory-exists?)
+        (and/c path-relative-to-cwd/c free-directory-name/c)
+        void?)]))
 
 
 (require
   (only-in racket/string
     string-replace)
+  racket/file
   racket/match
   racket/runtime-path)
 
@@ -56,7 +61,8 @@
   (make-bib-file! paper-name)
   (make-makefile! paper-name)
   (make-reader-file! paper-name)
-  (log-gtp-paper-info "successfully created paper. Next: `cd ~a; make all`" paper-name)
+  (log-gtp-paper-info "successfully created paper '~a'" paper-name)
+  (log-gtp-paper-info "NEXT STEPS: `cd ~a; make all`" paper-name)
   (void))
 
 (define (make-paper-directory! paper-name)
@@ -113,7 +119,49 @@
         (with-input-from-file src-path
           (λ ()
             (for ((ln (in-lines)))
-              (displayln (string-replace ln "~a" paper-name)))))))]))
+              (displayln (string-replace ln "~a" paper-name)))))))
+    (log-gtp-paper-info "- ~a" dst-path)
+    (void)]))
+
+;; -----------------------------------------------------------------------------
+
+(define (rename-paper src-name dst-name)
+  (log-gtp-paper-info "renaming paper '~a' to '~a' ..." src-name dst-name)
+  (copy-directory/files src-name dst-name)
+  (rename-names/contents! dst-name src-name dst-name)
+  (log-gtp-paper-info "successfully renamed paper '~a' to '~a'" src-name dst-name)
+  (log-gtp-paper-info "NEXT STEPS: `raco pkg remove ~a; cd ~a; make all`" src-name dst-name)
+  (void))
+
+(define (rename-names/contents! root src-name dst-name)
+  (let loop ([dir root])
+    (parameterize ([current-directory dir])
+      (for ([x (in-list (directory-list #:build? #false))])
+        (define old-name (path->string x))
+        (define new-name (string-replace old-name src-name dst-name))
+        (unless (string=? old-name new-name)
+          (rename-file-or-directory old-name new-name))
+        (if (directory-exists? new-name)
+          (loop new-name)
+          (rename-file-contents new-name src-name dst-name))))))
+
+(define (rename-file-contents filename src-name dst-name)
+  (define tmpfile (make-tmp-filename filename))
+  (with-output-to-file tmpfile #:exists 'error
+    (lambda ()
+      (with-input-from-file filename
+        (lambda ()
+          (for ((ln (in-lines)))
+            (displayln (string-replace ln src-name dst-name)))))))
+  (rename-file-or-directory tmpfile filename #true)
+  (void))
+
+(define (make-tmp-filename orig-filename)
+  (let loop ([f0 orig-filename])
+    (define f1 (path-add-extension f0 #".tmp"))
+    (if (file-exists? f1)
+      (loop f1)
+      f1)))
 
 ;; =============================================================================
 
@@ -126,11 +174,14 @@
      #:argv argv
      #:once-any
      [("-n" "--new") name "Start a new paper" (*mode* (cons 'new name))]
+     [("-r" "--rename") from to "Rename existing paper" (*mode* (list 'rename from to))]
      #:once-each
      #:args ()
      (match (*mode*)
       [(cons 'new name)
        (make-new-paper name)]
+      [(list 'rename from to)
+       (rename-paper from to)]
       [other-mode
        (log-gtp-paper-error "unrecognized mode ~a" other-mode)
        (loop '#("--help"))]))))
