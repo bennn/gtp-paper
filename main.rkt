@@ -5,9 +5,17 @@
 (require racket/contract)
 (provide
   GTP-PAPER
+
+  gtp-paper-logger
+  log-gtp-paper-debug
+  log-gtp-paper-info
+  log-gtp-paper-warning
+  log-gtp-paper-error
+  log-gtp-paper-fatal
+
   (contract-out
    [make-new-paper
-    (-> (and/c path-relative-to-cwd/c free-directory-name/c) boolean? void?)]))
+    (-> (and/c path-relative-to-cwd/c free-directory-name/c) void?)]))
 
 
 (require
@@ -38,11 +46,8 @@
     (not/c (or/c directory-exists?
                  file-exists?))))
 
-;; TODO stop using quiet? argument
-(define (make-new-paper paper-name quiet?)
-  (unless quiet?
-    #;(log-gtp-paper-info "making new paper '~a' ..." paper-name)
-    (printf "gtp-paper: making new paper '~a' ...~n" paper-name))
+(define (make-new-paper paper-name)
+  (log-gtp-paper-info "making new paper '~a' ..." paper-name)
   (make-paper-directory! paper-name)
   (make-info-file! paper-name)
   (make-main-file! paper-name)
@@ -51,9 +56,7 @@
   (make-bib-file! paper-name)
   (make-makefile! paper-name)
   (make-reader-file! paper-name)
-  (unless quiet?
-    #;(log-gtp-paper-info "successfully created paper. Next: `cd ~a; make all`" paper-name)
-    (printf "gtp-paper: successfully created paper, next run: `cd ~a; make all`~n" paper-name))
+  (log-gtp-paper-info "successfully created paper. Next: `cd ~a; make all`" paper-name)
   (void))
 
 (define (make-paper-directory! paper-name)
@@ -117,19 +120,20 @@
 (module* main racket/base
   (require racket/cmdline racket/match (submod ".."))
   (define *mode* (make-parameter #f))
-  (define *quiet?* (make-parameter #f))
-  (command-line
-   #:program (symbol->string GTP-PAPER)
-   #:once-any
-   [("-n" "--new") name "Start a new paper" (*mode* (cons 'new name))]
-   #:once-each
-   [("-q" "--quiet") "Run quietly" (*quiet?* #true)]
-   #:args ()
-   (match (*mode*)
-    [(cons 'new name)
-     (make-new-paper name (*quiet?*))]
-    [_
-     (printf "unrecognized mode, try 'raco gtp-paper --help'~n")])))
+  (let loop ([argv (current-command-line-arguments)])
+    (command-line
+     #:program (symbol->string GTP-PAPER)
+     #:argv argv
+     #:once-any
+     [("-n" "--new") name "Start a new paper" (*mode* (cons 'new name))]
+     #:once-each
+     #:args ()
+     (match (*mode*)
+      [(cons 'new name)
+       (make-new-paper name)]
+      [other-mode
+       (log-gtp-paper-error "unrecognized mode ~a" other-mode)
+       (loop '#("--help"))]))))
 
 ;; -----------------------------------------------------------------------------
 
