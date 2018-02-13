@@ -9,7 +9,7 @@ Raco tool for starting a new [GTP](http://prl.ccs.neu.edu/gtp/)-flavor Scribble 
 
 ```
 $ raco pkg install gtp-paper
-$ raco gtp-paper --new <NAME>
+$ PLTSTDERR="error info@gtp-paper" raco gtp-paper --new <NAME>
 $ raco pkg install ./<NAME>
 ```
 
