@@ -16,6 +16,8 @@
   (contract-out
    [make-new-paper
     (-> (and/c path-relative-to-cwd/c free-directory-name/c) void?)]
+   [remove-paper
+    (-> (and/c path-relative-to-cwd/c directory-exists?) void)]
    [rename-paper
     (-> (and/c path-relative-to-cwd/c directory-exists?)
         (and/c path-relative-to-cwd/c free-directory-name/c)
@@ -142,7 +144,9 @@
         (unless (string=? old-name new-name)
           (rename-file-or-directory old-name new-name))
         (if (directory-exists? new-name)
-          (loop new-name)
+          (if (string=? new-name "compiled")
+            (delete-directory/files new-name)
+            (loop new-name))
           (rename-file-contents new-name src-name dst-name))))))
 
 (define (rename-file-contents filename src-name dst-name)
@@ -163,6 +167,15 @@
       (loop f1)
       f1)))
 
+;; -----------------------------------------------------------------------------
+
+(define (remove-paper paper-name)
+  (log-gtp-paper-info "removing paper '~a' ..." paper-name)
+  (delete-directory/files paper-name)
+  (log-gtp-paper-info "successfully removed paper '~a'" paper-name)
+  (log-gtp-paper-info "NEXT STEPS: `raco pkg remove ~a`" paper-name)
+  (void))
+
 ;; =============================================================================
 
 (module* main racket/base
@@ -173,8 +186,9 @@
      #:program (symbol->string GTP-PAPER)
      #:argv argv
      #:once-any
-     [("-n" "--new") name "Start a new paper" (*mode* (cons 'new name))]
-     [("-r" "--rename") from to "Rename existing paper" (*mode* (list 'rename from to))]
+     [("--new") name "Start a new paper" (*mode* (cons 'new name))]
+     [("--rename") from to "Rename existing paper" (*mode* (list 'rename from to))]
+     [("--remove") name "Remove existing paper" (*mode* (cons 'remove name))]
      #:once-each
      #:args ()
      (match (*mode*)
@@ -182,6 +196,8 @@
        (make-new-paper name)]
       [(list 'rename from to)
        (rename-paper from to)]
+      [(cons 'remove name)
+       (remove-paper name)]
       [other-mode
        (log-gtp-paper-error "unrecognized mode ~a" other-mode)
        (loop '#("--help"))]))))
