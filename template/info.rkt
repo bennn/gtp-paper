@@ -7,6 +7,7 @@
 (define deps '(
   "at-exp-lib"
   "base"
+  "scribble-abbrevs"
   "scribble-lib"
 ))
 (define build-deps '(
