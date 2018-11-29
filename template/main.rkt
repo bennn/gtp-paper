@@ -7,20 +7,12 @@
     "bib.rkt"
     scribble-abbrevs
     scribble/acmart
-    scribble/doclang
+    scribble/acmart/lang
     scriblib/figure
     scribble/example
     scriblib/autobib)
   note ;; reprovide from scriblib/footnote
   (except-out (all-from-out scribble/manual) url)
-
-  (rename-out
-   [acmart:#%module-begin #%module-begin]
-
-   [format-url url]
-   ;; Usage: @url{URL}
-   ;;  format a URL, removes the `http://` prefix if given
-  )
 
   generate-bibliography
 
@@ -69,16 +61,13 @@
   racket/format
   racket/string
   scribble/acmart
+  scribble/acmart/lang
   scribble/core
   scribble/example
   scribble-abbrevs
   (except-in scriblib/autobib authors)
   scriblib/figure
   setup/main-collects
-  (except-in scribble/doclang
-    #%module-begin)
-  (only-in scribble/acmart/lang
-    [#%module-begin acmart:#%module-begin])
   (except-in scribble/manual
     title author)
   (only-in scriblib/footnote
