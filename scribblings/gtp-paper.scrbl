@@ -14,10 +14,10 @@ See @secref["command" #:doc '(lib "scribblings/raco/raco.scrbl")] for more about
 
 To start a new paper named @exec{MY-PAPER}:
 
-@nested[#:style' inset
-  @exec{$ raco gtp-paper --new MY-PAPER}
-  @exec{$ cd MY-PAPER}
-  @exec{$ make all}]
+@codeblock[#:expand values]|{
+  $ raco gtp-paper --new MY-PAPER
+  $ cd MY-PAPER
+  $ make all}|
 
 If all goes well, then you'll have:
 @itemlist[#:style 'ordered
