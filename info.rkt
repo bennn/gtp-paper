@@ -3,7 +3,7 @@
 (define deps '("base" "pollen" "scribble-abbrevs" "scribble-lib"))
 (define build-deps '("rackunit-lib" "racket-doc" "scribble-doc"))
 (define pkg-desc "Package for creating Scribble papers")
-(define version "0.0")
+(define version "0.1")
 (define pkg-authors '(ben))
 (define scribblings '(("scribblings/gtp-paper.scrbl" () (omit-start))))
 (define raco-commands '(("gtp-paper" (submod gtp-paper main) "Start a new paper" #f)))
