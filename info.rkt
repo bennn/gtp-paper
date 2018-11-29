@@ -5,7 +5,7 @@
 (define pkg-desc "Package for creating Scribble papers")
 (define version "0.0")
 (define pkg-authors '(ben))
-(define scribblings '(("docs/gtp-paper.scrbl" () (omit-start))))
+(define scribblings '(("scribblings/gtp-paper.scrbl" () (omit-start))))
 (define raco-commands '(("gtp-paper" (submod gtp-paper main) "Start a new paper" #f)))
 (define compile-omit-paths '("template"))
 (define test-omit-paths '("template"))
