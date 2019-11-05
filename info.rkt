@@ -1,6 +1,6 @@
 #lang info
 (define collection "gtp-paper")
-(define deps '("base" "pollen" "scribble-abbrevs" "scribble-lib"))
+(define deps '("base" "scribble-abbrevs" "scribble-lib"))
 (define build-deps '("rackunit-lib" "racket-doc" "scribble-doc"))
 (define pkg-desc "Package for creating Scribble papers")
 (define version "0.1")
